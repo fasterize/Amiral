@@ -1,0 +1,41 @@
+group_1:
+  MongoDB:
+    deploy_ratio: 100%
+  SSL:
+    deploy_ratio: 100%
+  VIP:
+    deploy_ratio: 100%
+  Bstats:
+    deploy_ratio: 100%
+  Testerize:
+    deploy_ratio: 100%
+  Backup:
+    deploy_ratio: 100%
+
+group_2:
+  Cache:
+    deploy_ratio: 100%
+  DNS:
+    deploy_ratio: 100%
+  FastApi:
+    deploy_ratio: 100%
+  Front:
+    deploy_ratio: 10%
+  Graphite:
+    deploy_ratio: 100%
+  LogstashServer:
+    deploy_ratio: 100%
+  Monitoring:
+    deploy_ratio: 100%
+  Proxy:
+    deploy_ratio: 30%
+  Web:
+    deploy_ratio: 50%
+  WebDatabase:
+    deploy_ratio: 50%
+  WebWorker:
+    deploy_ratio: 100%
+  Worker:
+    deploy_ratio: 30%
+  ZookeeperServer:
+    deploy_ratio: 10%
