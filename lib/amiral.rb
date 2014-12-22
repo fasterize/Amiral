@@ -1,14 +1,43 @@
 class Amiral
   @env = {}
+
+  @env_global = {}
+  @deploy_directive_unified = {}
+  @deploy_directive = {}
   @deployement_step = {}
 
+
   def initialize env, deploy_directive
-    @env = env
+    @env_global = env
     @deploy_directive = deploy_directive
+    @deploy_directive_unified = {}
+    deploy_directive.each{ |group, roles|
+      @deploy_directive_unified.merge!(roles)
+    }
+  end
+
+  def get_ships_for_specific_roles roles
+    env_result = {}
+    roles.each { |role|
+      @env_global.each { |hostname, content|
+        if !content[:roles].nil? and content[:roles].include? role[0] then
+          env_result[hostname]= content
+        end
+      }
+    }
+    return env_result
+  end
+
+  def clean_from_from_deployed_ship env, env_selected
+    _env = env
+    env_selected.each { |host, content|
+      _env.delete(host)
+    }
+    return _env
   end
 
   def compute_roles
-    list_role = Hash.new
+    list_role = {}
     fleet_roles = {}
     @env.each { |name, node|
       list_role = node[:roles] ? node[:roles]: []
@@ -25,7 +54,7 @@ class Amiral
     fleet_roles = compute_roles
 
     fleet_roles.each { |role, number|
-      ratio = @deploy_directive[role]["deploy_ratio"].gsub('%','').to_i
+      ratio = @deploy_directive_unified[role]["deploy_ratio"].gsub('%','').to_i
       solder_to_deploy = (number * ratio / 100).to_i
       solder_to_deploy = solder_to_deploy == 0 ? 1 : solder_to_deploy
       #pp "solder #{role}: #{solder_to_deploy}/#{number} "
@@ -48,7 +77,7 @@ class Amiral
 
   # AMIRAL: ALL solders .... you are afected to your war boat
   #
-  def amiral_deploy_order
+  def deploy_order_by_group
     step =0
     deployement_step = compute_role_deployement_step
     deployement_host_step = []
@@ -104,6 +133,16 @@ class Amiral
         break
       end
     end
+    return deployement_host_step
+  end
+
+  def deploy_order_for_all
+    deployement_host_step = {}
+    @deploy_directive.each { |group, roles|
+      @env = get_ships_for_specific_roles roles
+      @env_global = clean_from_from_deployed_ship(@env_global, @env)
+      deployement_host_step[group] = deploy_order_by_group.delete_if{ |list| list.length == 0 }
+    }
     return deployement_host_step
   end
 
